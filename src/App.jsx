@@ -191,7 +191,7 @@ export default function App() {
 
     setLoading(true);
     try {
-      const data = await searchOpenAI(kw.text, config.oaKey);
+      const data = await searchOpenAI(kw.text);
       if (data.mentions?.length > 0) {
         const ins = data.mentions
           .filter(m => m.url?.startsWith("http"))

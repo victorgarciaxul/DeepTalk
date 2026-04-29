@@ -39,53 +39,15 @@ export function sbClient(url, key) {
   };
 }
 
-export async function searchOpenAI(keyword, apiKey) {
-  const res = await fetch("https://api.openai.com/v1/chat/completions", {
+export async function searchOpenAI(keyword) {
+  // Llamada al proxy serverless para evitar CORS
+  const res = await fetch("/api/search", {
     method: "POST",
-    headers: {
-      "Authorization": `Bearer ${apiKey}`,
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      model: "gpt-4o-search-preview",
-      web_search_options: {},
-      messages: [
-        {
-          role: "system",
-          content: `Eres un experto en clipping. Responde EXCLUSIVAMENTE con un JSON válido. No escribas nada más.
-          Formato: {"total":número,"mentions":[{"title":"...","source":"...","url":"https://...","date":"DD/MM/YYYY","excerpt":"..."}],"sources":[{"name":"...","count":número}]}. 
-          Busca hasta 20 menciones. Excerpts breves de 1 frase.`
-        },
-        {
-          role: "user",
-          content: `Busca menciones recientes de "${keyword}" en prensa digital de España.`
-        }
-      ],
-      max_tokens: 4096
-    })
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ keyword })
   });
-  
+
   const data = await res.json();
-  if (data.error) throw new Error(data.error.message);
-  
-  const content = data?.choices?.[0]?.message?.content;
-  if (!content) throw new Error("Sin respuesta");
-  
-  let clean = content.replace(/```json|```/g, "").trim();
-  const s = clean.indexOf("{");
-  const e = clean.lastIndexOf("}");
-  
-  if (s === -1 || e === -1) throw new Error("La respuesta no contiene un JSON válido");
-  
-  const jsonStr = clean.slice(s, e + 1);
-  try {
-    return JSON.parse(jsonStr);
-  } catch (err) {
-    console.warn("JSON mal formado, intentando recuperar...", err);
-    // Basic recovery for truncated JSON (closing brackets)
-    if (!jsonStr.endsWith("}")) {
-       try { return JSON.parse(jsonStr + '}]}'); } catch(e2) {}
-    }
-    throw new Error("Error en el formato de datos de OpenAI. Inténtalo de nuevo.");
-  }
+  if (!res.ok) throw new Error(data.error || "Error en la búsqueda");
+  return data;
 }
