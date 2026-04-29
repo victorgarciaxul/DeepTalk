@@ -9,8 +9,8 @@ export default function Login({ onLogin }) {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    document.body.classList.add('xul-login-body');
-    return () => document.body.classList.remove('xul-login-body');
+    document.body.style.background = '#0A0A0B';
+    return () => { document.body.style.background = ''; };
   }, []);
 
   const handleSubmit = (e) => {
@@ -26,10 +26,6 @@ export default function Login({ onLogin }) {
   return (
     <>
       <style>{`
-        .xul-login-body {
-          background: #0A0A0B !important;
-          font-family: 'Plus Jakarta Sans', 'Inter', sans-serif !important;
-        }
         .login-screen {
           position: fixed;
           inset: 0;
@@ -38,6 +34,8 @@ export default function Login({ onLogin }) {
           background: #0A0A0B;
           z-index: 1000;
           overflow: hidden;
+          font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+          color: #EDEDEE;
         }
         .login-bg-blob {
           position: absolute;
@@ -70,37 +68,23 @@ export default function Login({ onLogin }) {
           from { transform: translateY(20px); opacity: 0; }
           to   { transform: translateY(0);    opacity: 1; }
         }
-        .login-brand {
+        .login-logo {
+          height: 60px;
           margin-bottom: 32px;
-        }
-        .login-brand-name {
-          font-size: 28px;
-          font-weight: 800;
-          letter-spacing: -0.04em;
-          color: #EDEDEE;
-          font-family: 'Plus Jakarta Sans', sans-serif;
-        }
-        .login-brand-sub {
-          font-size: 12px;
-          color: #6C6C74;
-          text-transform: uppercase;
-          letter-spacing: 0.1em;
-          margin-top: 4px;
-        }
-        .login-header {
-          margin-bottom: 32px;
+          filter: drop-shadow(0 4px 10px rgba(0,0,0,0.05));
         }
         .login-header h1 {
-          font-size: 20px;
+          font-size: 24px;
           font-weight: 600;
           letter-spacing: -0.03em;
           color: #EDEDEE;
-          margin-bottom: 6px;
+          margin-bottom: 8px;
           font-family: 'Plus Jakarta Sans', sans-serif;
         }
         .login-header p {
           color: #A1A1A8;
           font-size: 14px;
+          margin-bottom: 32px;
         }
         .login-form {
           display: flex;
@@ -131,6 +115,9 @@ export default function Login({ onLogin }) {
           transition: all 0.2s;
           outline: none;
           font-family: inherit;
+        }
+        .login-input::placeholder {
+          color: rgba(237,237,238,0.35);
         }
         .login-input:focus {
           border-color: #7A3FAF;
@@ -173,13 +160,10 @@ export default function Login({ onLogin }) {
       <div className="login-screen">
         <div className="login-bg-blob" />
         <div className="login-card">
-          <div className="login-brand">
-            <div className="login-brand-name">XUL</div>
-            <div className="login-brand-sub">Monitor de Medios</div>
-          </div>
+          <img src="/logo-xul.png" className="login-logo" alt="XUL Logo" />
           <div className="login-header">
-            <h1>Bienvenido</h1>
-            <p>Introduce tus credenciales para acceder.</p>
+            <h1>DeepTalk</h1>
+            <p>Bienvenido/a. Introduce tus credenciales.</p>
           </div>
           <form className="login-form" onSubmit={handleSubmit}>
             <div className="login-input-group">
