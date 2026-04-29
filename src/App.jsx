@@ -33,10 +33,10 @@ const analyzeMention = (m, subKw1, subKw2) => {
 
 export default function App() {
   const [config, setConfig] = useState({
-    sbUrl: localStorage.getItem('xul_sb_url') || '',
-    sbKey: localStorage.getItem('xul_sb_key') || '',
-    oaKey: localStorage.getItem('xul_oa_key') || '',
-    isConfigured: false
+    sbUrl: import.meta.env.VITE_SB_URL || localStorage.getItem('xul_sb_url') || '',
+    sbKey: import.meta.env.VITE_SB_KEY || localStorage.getItem('xul_sb_key') || '',
+    oaKey: import.meta.env.VITE_OA_KEY || localStorage.getItem('xul_oa_key') || '',
+    isConfigured: !!(import.meta.env.VITE_SB_URL && import.meta.env.VITE_SB_KEY && import.meta.env.VITE_OA_KEY)
   });
 
   const [db, setDb] = useState(null);
@@ -59,7 +59,7 @@ export default function App() {
   }, [darkMode]);
 
   useEffect(() => {
-    if (config.sbUrl && config.sbKey && config.oaKey) {
+    if (config.sbUrl && config.sbKey) {
       const client = sbClient(config.sbUrl, config.sbKey);
       setDb(client);
       setConfig(prev => ({ ...prev, isConfigured: true }));
