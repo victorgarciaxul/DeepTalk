@@ -41,10 +41,8 @@ export function sbClient(url, key) {
 
 export async function searchOpenAI(keyword) {
   // Llamada al proxy serverless para evitar CORS
-  const res = await fetch("/api/search", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ keyword })
+  const res = await fetch("/api/search?keyword=" + encodeURIComponent(keyword), {
+    method: "GET"
   });
 
   let data;
