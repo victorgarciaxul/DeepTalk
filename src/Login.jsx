@@ -117,7 +117,8 @@ export default function Login({ onLogin }) {
           font-family: inherit;
         }
         .login-input::placeholder {
-          color: rgba(237,237,238,0.35);
+          color: #EDEDEE;
+          opacity: 1;
         }
         .login-input:focus {
           border-color: #7A3FAF;
