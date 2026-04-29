@@ -47,7 +47,8 @@ export async function searchOpenAI(keyword) {
     body: JSON.stringify({ keyword })
   });
 
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || "Error en la búsqueda");
+  let data;
+  try { data = await res.json(); } catch { throw new Error("El servidor no devolvió JSON válido"); }
+  if (!res.ok) throw new Error(data.error || `Error ${res.status} en la búsqueda`);
   return data;
 }
