@@ -6,7 +6,7 @@ export default async function handler(req, res) {
   const { keyword } = req.body;
   if (!keyword) return res.status(400).json({ error: 'keyword required' });
 
-  const apiKey = process.env.VITE_OA_KEY;
+  const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) return res.status(500).json({ error: 'OpenAI key not configured' });
 
   try {
