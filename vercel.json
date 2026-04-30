@@ -1,7 +1,6 @@
 {
   "functions": {
-    "api/search.js": {
-      "maxDuration": 30
-    }
+    "api/search.js": { "maxDuration": 30 },
+    "api/rss.js":    { "maxDuration": 30 }
   }
 }

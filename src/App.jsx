@@ -8,7 +8,7 @@ import {
 import { PieChart, Pie, Cell, Tooltip as RechartsTooltip, ResponsiveContainer, Legend } from 'recharts';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import { sbClient, searchOpenAI } from './utils/api';
+import { sbClient, searchOpenAI, searchRSS } from './utils/api';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
@@ -189,26 +189,48 @@ export default function App() {
 
     setLoading(true);
     try {
-      const data = await searchOpenAI(kw.text);
-      if (data.mentions?.length > 0) {
-        const ins = data.mentions
-          .filter(m => m.url?.startsWith("http"))
-          .map(m => ({
-            keyword_id: kw.id,
-            keyword_text: kw.text,
-            title: m.title || "",
-            source: m.source || "",
-            url: m.url,
-            mention_date: m.date || "",
-            excerpt: m.excerpt || ""
-          }));
+      // Lanzar OpenAI y RSS en paralelo para máxima cobertura
+      const [aiResult, rssResult] = await Promise.allSettled([
+        searchOpenAI(kw.text),
+        searchRSS(kw.text)
+      ]);
 
-        if (ins.length > 0) {
-          try { await db.post("mentions", ins); } catch (e) { console.error("Error saving mentions", e); }
-        }
-        try { await db.patch("keywords", kw.id, { last_searched_at: new Date().toISOString() }); } catch (e) { }
-        await loadKeywords(db);
-        await loadMentions(db, kw.id, dateFrom, dateTo);
+      const aiMentions  = aiResult.status  === 'fulfilled' ? (aiResult.value.mentions  || []) : [];
+      const rssMentions = rssResult.status === 'fulfilled' ? (rssResult.value.mentions || []) : [];
+
+      // Fusionar y deduplicar por URL
+      const seenUrls = new Set();
+      const combined = [...aiMentions, ...rssMentions].filter(m => {
+        if (!m.url?.startsWith("http")) return false;
+        const key = m.url.replace(/^https?:\/\/(www\.)?/, '').split('?')[0];
+        if (seenUrls.has(key)) return false;
+        seenUrls.add(key);
+        return true;
+      });
+
+      if (combined.length > 0) {
+        const ins = combined.map(m => ({
+          keyword_id:   kw.id,
+          keyword_text: kw.text,
+          title:        m.title   || "",
+          source:       m.source  || "",
+          url:          m.url,
+          mention_date: m.date    || "",
+          excerpt:      m.excerpt || ""
+        }));
+        try { await db.post("mentions", ins); } catch (e) { console.error("Error guardando menciones", e); }
+      }
+
+      try { await db.patch("keywords", kw.id, { last_searched_at: new Date().toISOString() }); } catch (e) {}
+      await loadKeywords(db);
+      await loadMentions(db, kw.id, dateFrom, dateTo);
+
+      if (combined.length === 0) {
+        const errMsg = [
+          aiResult.status  === 'rejected' ? `OpenAI: ${aiResult.reason?.message}`  : null,
+          rssResult.status === 'rejected' ? `RSS: ${rssResult.reason?.message}`     : null
+        ].filter(Boolean).join(' | ');
+        if (errMsg) alert("Aviso: " + errMsg);
       }
     } catch (e) {
       alert("Error: " + e.message);

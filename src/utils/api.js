@@ -40,13 +40,17 @@ export function sbClient(url, key) {
 }
 
 export async function searchOpenAI(keyword) {
-  // Llamada al proxy serverless para evitar CORS
-  const res = await fetch("/api/search?keyword=" + encodeURIComponent(keyword), {
-    method: "GET"
-  });
-
+  const res = await fetch("/api/search?keyword=" + encodeURIComponent(keyword), { method: "GET" });
   let data;
   try { data = await res.json(); } catch { throw new Error("El servidor no devolvió JSON válido"); }
   if (!res.ok) throw new Error(data.error || `Error ${res.status} en la búsqueda`);
+  return data;
+}
+
+export async function searchRSS(keyword) {
+  const res = await fetch("/api/rss?keyword=" + encodeURIComponent(keyword), { method: "GET" });
+  let data;
+  try { data = await res.json(); } catch { throw new Error("RSS: El servidor no devolvió JSON válido"); }
+  if (!res.ok) throw new Error(data.error || `Error ${res.status} en RSS`);
   return data;
 }
