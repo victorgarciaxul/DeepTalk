@@ -257,22 +257,13 @@ export default function App() {
 
   const enrichedMentions = mentions.map(m => analyzeMention(m, subKw1, subKw2)).filter(m => {
     if (!dateFrom && !dateTo) return true;
-
-    const mDate = toDateKey(m.mention_date);
+    // Filtramos por found_at (fecha en que se encontró la noticia),
+    // que es fiable y refleja cuándo el usuario hizo la búsqueda.
     const fDate = toDateKey(m.found_at);
-
-    // Include if EITHER the publication date OR the search date falls within range.
-    // This way articles found this month always appear when filtering by this month,
-    // regardless of their original publication date.
-    const inRange = (key) => {
-      if (!key) return false;
-      if (dateFrom && key < dateFrom) return false;
-      if (dateTo && key > dateTo) return false;
-      return true;
-    };
-
-    if (mDate || fDate) return inRange(mDate) || inRange(fDate);
-    return true; // no parseable date → always include
+    if (!fDate) return true;
+    if (dateFrom && fDate < dateFrom) return false;
+    if (dateTo && fDate > dateTo) return false;
+    return true;
   });
 
   const isFiltered = dateFrom || dateTo;
