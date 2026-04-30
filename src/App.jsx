@@ -555,15 +555,6 @@ export default function App() {
                 <Plus className="w-5 h-5" />
               </button>
             </form>
-            <button
-              className="btn-secondary"
-              onClick={() => {
-                ['xul_sb_url', 'xul_sb_key', 'xul_oa_key'].forEach(k => localStorage.removeItem(k));
-                setConfig({ sbUrl: '', sbKey: '', oaKey: '', isConfigured: false });
-              }}
-            >
-              <Settings className="w-4 h-4" /> Reconfigurar Accesos
-            </button>
           </div>
         </aside>
 
