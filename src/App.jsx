@@ -451,8 +451,25 @@ export default function App() {
     <div id="root" className="glass-panel app-container">
       <header className="header">
         <div className="header-brand">
-          <Activity className="w-6 h-6 text-accent" style={{ color: 'var(--accent)' }} />
-          <h1 className="header-title">XUL <span style={{ fontWeight: 400, color: 'var(--text-tertiary)' }}>· Monitor de Medios</span></h1>
+          {/* DeepTalk logo — icono auricular dorado */}
+          <div style={{
+            width: 36, height: 36, borderRadius: 10,
+            background: 'linear-gradient(145deg, #1a2a1a 0%, #0f1f0f 100%)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            flexShrink: 0, boxShadow: '0 2px 8px rgba(0,0,0,0.5)'
+          }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              {/* Arco superior del auricular */}
+              <path d="M5 12C5 8.13 8.13 5 12 5C15.87 5 19 8.13 19 12" stroke="#F5A623" strokeWidth="2.2" strokeLinecap="round" fill="none"/>
+              {/* Orejera izquierda */}
+              <rect x="3" y="12" width="4" height="6" rx="2" fill="#F5A623"/>
+              {/* Orejera derecha */}
+              <rect x="17" y="12" width="4" height="6" rx="2" fill="#F5A623"/>
+            </svg>
+          </div>
+          <h1 className="header-title" style={{ fontFamily: 'var(--font-heading)', fontWeight: 800, letterSpacing: '-0.03em' }}>
+            DeepTalk
+          </h1>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
           <div className="header-badge">
