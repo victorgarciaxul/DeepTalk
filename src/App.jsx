@@ -189,10 +189,10 @@ export default function App() {
 
     setLoading(true);
     try {
-      // Lanzar OpenAI y RSS en paralelo para máxima cobertura
+      // Lanzar OpenAI y RSS en paralelo, pasando el rango de fechas activo
       const [aiResult, rssResult] = await Promise.allSettled([
-        searchOpenAI(kw.text),
-        searchRSS(kw.text)
+        searchOpenAI(kw.text, dateFrom, dateTo),
+        searchRSS(kw.text, dateFrom, dateTo)
       ]);
 
       const aiMentions  = aiResult.status  === 'fulfilled' ? (aiResult.value.mentions  || []) : [];

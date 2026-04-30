@@ -39,16 +39,22 @@ export function sbClient(url, key) {
   };
 }
 
-export async function searchOpenAI(keyword) {
-  const res = await fetch("/api/search?keyword=" + encodeURIComponent(keyword), { method: "GET" });
+export async function searchOpenAI(keyword, from = '', to = '') {
+  let url = "/api/search?keyword=" + encodeURIComponent(keyword);
+  if (from) url += "&from=" + encodeURIComponent(from);
+  if (to)   url += "&to="   + encodeURIComponent(to);
+  const res = await fetch(url, { method: "GET" });
   let data;
   try { data = await res.json(); } catch { throw new Error("El servidor no devolvió JSON válido"); }
   if (!res.ok) throw new Error(data.error || `Error ${res.status} en la búsqueda`);
   return data;
 }
 
-export async function searchRSS(keyword) {
-  const res = await fetch("/api/rss?keyword=" + encodeURIComponent(keyword), { method: "GET" });
+export async function searchRSS(keyword, from = '', to = '') {
+  let url = "/api/rss?keyword=" + encodeURIComponent(keyword);
+  if (from) url += "&from=" + encodeURIComponent(from);
+  if (to)   url += "&to="   + encodeURIComponent(to);
+  const res = await fetch(url, { method: "GET" });
   let data;
   try { data = await res.json(); } catch { throw new Error("RSS: El servidor no devolvió JSON válido"); }
   if (!res.ok) throw new Error(data.error || `Error ${res.status} en RSS`);
