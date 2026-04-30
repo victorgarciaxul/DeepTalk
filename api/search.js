@@ -33,14 +33,14 @@ module.exports = async function handler(req, res) {
         messages: [
           {
             role: 'system',
-            content: 'Eres un experto en clipping de medios. Responde EXCLUSIVAMENTE con un JSON valido, sin texto adicional. Formato exacto: {"total":numero,"mentions":[{"title":"...","source":"...","url":"https://...","date":"DD/MM/YYYY","excerpt":"..."}],"sources":[{"name":"...","count":numero}]}. Busca el maximo de menciones posible, hasta 50. Excerpts breves de 1 frase. Incluye TODAS las fuentes disponibles: periodicos nacionales (El Pais, El Mundo, ABC, La Vanguardia, El Confidencial, 20minutos, Publico, elDiario.es, OKDiario, La Razon, El Espanol, Expansion, Cinco Dias, El Economista), periodicos regionales, portales de noticias online, agencias de noticias (EFE, Europa Press), revistas especializadas, medios de comunicacion internacionales que cubran Espana, blogs especializados, medios sectoriales y cualquier otra fuente digital relevante.'
+            content: 'Eres un experto en clipping de medios. Responde EXCLUSIVAMENTE con un JSON valido, sin texto adicional. Formato exacto: {"total":numero,"mentions":[{"title":"...","source":"...","url":"https://...","date":"DD/MM/YYYY","excerpt":"..."}],"sources":[{"name":"...","count":numero}]}. SIN LIMITE de menciones: incluye ABSOLUTAMENTE TODAS las que encuentres. Excerpts breves de 1 frase. Incluye TODAS las fuentes posibles: periodicos nacionales (El Pais, El Mundo, ABC, La Vanguardia, El Confidencial, 20minutos, Publico, elDiario.es, OKDiario, La Razon, El Espanol, Expansion, Cinco Dias, El Economista, La Sexta, RTVE, Cadena SER, El Plural, InfoLibre, Libertad Digital, El Debate), periodicos regionales y locales de todas las comunidades autonomas, portales de noticias online, agencias de noticias (EFE, Europa Press, Reuters, AP), revistas especializadas de cualquier sector, medios de comunicacion internacionales que mencionen Espana, blogs especializados, medios sectoriales, foros relevantes, publicaciones de organismos oficiales y cualquier otra fuente digital donde aparezca la keyword.'
           },
           {
             role: 'user',
-            content: 'Realiza una busqueda exhaustiva de TODAS las menciones recientes de "' + keyword + '" en todo tipo de medios digitales: prensa nacional y regional espanola, medios internacionales, agencias de noticias, portales especializados y cualquier fuente online relevante. No limites la busqueda a ningun tipo concreto de medio. Devuelve todas las menciones que encuentres, ordenadas de mas reciente a mas antigua.'
+            content: 'Realiza una busqueda EXHAUSTIVA y SIN LIMITE de TODAS las menciones de "' + keyword + '" en cualquier medio digital: prensa nacional, regional y local espanola, medios internacionales, agencias de noticias, televisiones, radios online, portales especializados, blogs, foros y cualquier fuente online donde aparezca esta keyword. No omitas ninguna mencion, sin importar el tipo de medio. Devuelve TODAS las menciones que encuentres sin excepcion, ordenadas de mas reciente a mas antigua.'
           }
         ],
-        max_tokens: 8192
+        max_tokens: 16000
       })
     });
 
