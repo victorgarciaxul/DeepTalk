@@ -27,18 +27,20 @@ module.exports = async function handler(req, res) {
       },
       body: JSON.stringify({
         model: 'gpt-4o-search-preview',
-        web_search_options: {},
+        web_search_options: {
+          search_context_size: 'high'
+        },
         messages: [
           {
             role: 'system',
-            content: 'Eres un experto en clipping. Responde EXCLUSIVAMENTE con un JSON valido. Formato: {"total":numero,"mentions":[{"title":"...","source":"...","url":"https://...","date":"DD/MM/YYYY","excerpt":"..."}],"sources":[{"name":"...","count":numero}]}. Busca hasta 20 menciones. Excerpts breves de 1 frase.'
+            content: 'Eres un experto en clipping de medios. Responde EXCLUSIVAMENTE con un JSON valido, sin texto adicional. Formato exacto: {"total":numero,"mentions":[{"title":"...","source":"...","url":"https://...","date":"DD/MM/YYYY","excerpt":"..."}],"sources":[{"name":"...","count":numero}]}. Busca el maximo de menciones posible, hasta 50. Excerpts breves de 1 frase. Incluye TODAS las fuentes disponibles: periodicos nacionales (El Pais, El Mundo, ABC, La Vanguardia, El Confidencial, 20minutos, Publico, elDiario.es, OKDiario, La Razon, El Espanol, Expansion, Cinco Dias, El Economista), periodicos regionales, portales de noticias online, agencias de noticias (EFE, Europa Press), revistas especializadas, medios de comunicacion internacionales que cubran Espana, blogs especializados, medios sectoriales y cualquier otra fuente digital relevante.'
           },
           {
             role: 'user',
-            content: 'Busca menciones recientes de "' + keyword + '" en prensa digital de Espana.'
+            content: 'Realiza una busqueda exhaustiva de TODAS las menciones recientes de "' + keyword + '" en todo tipo de medios digitales: prensa nacional y regional espanola, medios internacionales, agencias de noticias, portales especializados y cualquier fuente online relevante. No limites la busqueda a ningun tipo concreto de medio. Devuelve todas las menciones que encuentres, ordenadas de mas reciente a mas antigua.'
           }
         ],
-        max_tokens: 4096
+        max_tokens: 8192
       })
     });
 
