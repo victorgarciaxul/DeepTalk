@@ -826,6 +826,33 @@ body.dark input[type="date"] {
   width: 100%;
   border-collapse: collapse;
   text-align: left;
+  table-layout: fixed;
+}
+
+/* Anchos de columnas: Titular | Contexto | Valoración | Medio | K1 | K2 | Alcance | Valor | Fecha | Link */
+.mentions-table th:nth-child(1), .mentions-table td:nth-child(1) { width: 220px; min-width: 180px; }
+.mentions-table th:nth-child(2), .mentions-table td:nth-child(2) { width: auto; }
+.mentions-table th:nth-child(3), .mentions-table td:nth-child(3) { width: 90px;  min-width: 90px; }
+.mentions-table th:nth-child(4), .mentions-table td:nth-child(4) { width: 140px; min-width: 110px; }
+.mentions-table th:nth-child(5), .mentions-table td:nth-child(5) { width: 80px;  min-width: 70px; }
+.mentions-table th:nth-child(6), .mentions-table td:nth-child(6) { width: 80px;  min-width: 70px; }
+.mentions-table th:nth-child(7), .mentions-table td:nth-child(7) { width: 90px;  min-width: 80px; }
+.mentions-table th:nth-child(8), .mentions-table td:nth-child(8) { width: 100px; min-width: 90px; }
+.mentions-table th:nth-child(9), .mentions-table td:nth-child(9) { width: 95px;  min-width: 85px; }
+.mentions-table th:nth-child(10),.mentions-table td:nth-child(10){ width: 40px;  min-width: 40px; }
+
+/* Titular: wrap limpio */
+.mentions-table td:nth-child(1) {
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Contexto mención: limitar alto con ellipsis */
+.mentions-table td:nth-child(2) {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
 }
 
 .mentions-table th {
