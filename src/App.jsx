@@ -276,7 +276,16 @@ export default function App() {
   };
 
   // El filtrado por fecha se hace en Supabase (server-side), no en cliente
-  const enrichedMentions = mentions.map(m => analyzeMention(m, subKw1, subKw2));
+  const enrichedMentions = mentions
+    .map(m => analyzeMention(m, subKw1, subKw2))
+    .sort((a, b) => {
+      // Ordenar por fecha de publicación (mention_date), fallback a found_at
+      const da = toDateKey(a.mention_date) || toDateKey(a.found_at) || '';
+      const db = toDateKey(b.mention_date) || toDateKey(b.found_at) || '';
+      if (da > db) return -1;
+      if (da < db) return 1;
+      return 0;
+    });
 
   const isFiltered = dateFrom || dateTo;
   const clearDateFilter = () => { setDateFrom(''); setDateTo(''); };
