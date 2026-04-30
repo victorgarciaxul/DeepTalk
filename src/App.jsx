@@ -53,6 +53,7 @@ export default function App() {
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
   const [showDateFilter, setShowDateFilter] = useState(false);
+  const [openFaq, setOpenFaq] = useState(null);
 
   useEffect(() => {
     document.body.classList.toggle('dark', darkMode);
@@ -491,6 +492,42 @@ export default function App() {
             ))}
           </div>
           <div className="sidebar-footer">
+            {/* FAQs */}
+            {[
+              {
+                id: 1,
+                icon: <Layers className="w-3.5 h-3.5" />,
+                q: '¿Qué fuentes analiza?',
+                a: 'Rastrea más de 28 fuentes en paralelo: Google News (que agrega cientos de medios españoles automáticamente), El País, El Mundo, ABC, La Vanguardia, El Confidencial, RTVE, Cadena SER, COPE, Onda Cero, Europa Press, Expansión, elDiario.es, Público, El Español, OKDiario, medios regionales y más. Además, OpenAI busca en toda la web pública indexada.'
+              },
+              {
+                id: 2,
+                icon: <Info className="w-3.5 h-3.5" />,
+                q: '¿Qué limitaciones tiene?',
+                a: 'No accede a contenido de pago (muros de suscripción), redes sociales (X, Instagram, TikTok), bases de datos privadas (Factiva, Lexis-Nexis) ni medios que bloqueen rastreo. Los resultados dependen de lo que esté publicado e indexado en el momento de la búsqueda.'
+              },
+              {
+                id: 3,
+                icon: <Database className="w-3.5 h-3.5" />,
+                q: '¿Cómo se calcula el valor económico?',
+                a: 'Se usa el VPE (Valor Publicitario Equivalente): se estima el alcance del medio y se multiplica por un factor según el tono de la noticia — positivo (×0,5), neutro (×0,25) o negativo (×0,1). Es una estimación orientativa, no un valor auditado.'
+              }
+            ].map(faq => (
+              <div key={faq.id} className="faq-item">
+                <button
+                  className="faq-trigger"
+                  onClick={() => setOpenFaq(openFaq === faq.id ? null : faq.id)}
+                >
+                  <span className="faq-icon">{faq.icon}</span>
+                  <span className="faq-question">{faq.q}</span>
+                  <span className="faq-chevron" style={{ transform: openFaq === faq.id ? 'rotate(180deg)' : 'rotate(0deg)' }}>▾</span>
+                </button>
+                {openFaq === faq.id && (
+                  <div className="faq-answer">{faq.a}</div>
+                )}
+              </div>
+            ))}
+
             <form className="add-kw-form" onSubmit={handleAddKeyword}>
               <input
                 value={newKw}
