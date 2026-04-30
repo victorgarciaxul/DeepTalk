@@ -12,8 +12,8 @@ import { sbClient, searchOpenAI, searchRSS } from './utils/api';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
-const COLORS = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6", "#ec4899", "#14b8a6", "#f97316"];
-const PIE_COLORS = ['#3b82f6', '#f59e0b', '#10b981'];
+const COLORS = ["#7A3FAF", "#10b981", "#f59e0b", "#ef4444", "#9B5FD0", "#ec4899", "#14b8a6", "#f97316"];
+const PIE_COLORS = ['#7A3FAF', '#f59e0b', '#10b981'];
 
 const analyzeMention = (m, subKw1, subKw2) => {
   const text = ((m.title || '') + ' ' + (m.excerpt || '')).toLowerCase();
@@ -379,7 +379,7 @@ export default function App() {
         2: { cellWidth: 25, halign: 'center' },
         3: { cellWidth: 30, halign: 'right' },
         4: { cellWidth: 35, halign: 'right', fontStyle: 'bold' },
-        5: { cellWidth: 60, textColor: [59, 130, 246] }
+        5: { cellWidth: 60, textColor: [122, 63, 175] }
       },
       margin: { left: 14, right: 14 }
     });
