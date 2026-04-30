@@ -85,11 +85,9 @@ export default function App() {
   const loadMentions = async (client, kwId, from = '', to = '') => {
     try {
       let query = `keyword_id=eq.${kwId}&order=found_at.desc`;
-      if (!from && !to) {
-        query += `&limit=200`;
-      }
-      // When date filter is active: no limit, all records come back
-      // Client-side filter handles mention_date vs found_at correctly
+      if (from) query += `&found_at=gte.${from}T00:00:00`;
+      if (to)   query += `&found_at=lte.${to}T23:59:59`;
+      if (!from && !to) query += `&limit=200`;
       const rows = await client.get("mentions", query);
       setMentions(rows);
 
@@ -255,16 +253,8 @@ export default function App() {
     return null;
   };
 
-  const enrichedMentions = mentions.map(m => analyzeMention(m, subKw1, subKw2)).filter(m => {
-    if (!dateFrom && !dateTo) return true;
-    // Filtramos por found_at (fecha en que se encontró la noticia),
-    // que es fiable y refleja cuándo el usuario hizo la búsqueda.
-    const fDate = toDateKey(m.found_at);
-    if (!fDate) return true;
-    if (dateFrom && fDate < dateFrom) return false;
-    if (dateTo && fDate > dateTo) return false;
-    return true;
-  });
+  // El filtrado por fecha se hace en Supabase (server-side), no en cliente
+  const enrichedMentions = mentions.map(m => analyzeMention(m, subKw1, subKw2));
 
   const isFiltered = dateFrom || dateTo;
   const clearDateFilter = () => { setDateFrom(''); setDateTo(''); };
