@@ -870,6 +870,192 @@ body.dark input[type="date"] {
   margin-bottom: 0.5rem;
 }
 
+/* ===== NEWS CARDS — estilo MyNews ===== */
+.news-cards-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.news-card {
+  border-bottom: 1px solid var(--panel-border);
+  padding: 0.9rem 1.5rem;
+  transition: background 0.15s;
+}
+
+.news-card:last-child { border-bottom: none; }
+.news-card:hover { background: var(--element-bg); }
+
+/* Cabecera */
+.nc-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.45rem;
+  flex-wrap: wrap;
+}
+
+.nc-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.nc-media-icon {
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: white;
+  flex-shrink: 0;
+}
+
+.nc-source {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.nc-meta-sep {
+  color: var(--text-tertiary);
+  font-size: 0.75rem;
+}
+
+.nc-meta {
+  font-size: 0.72rem;
+  color: var(--text-tertiary);
+}
+
+.nc-meta strong {
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.nc-header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+.nc-date {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-tertiary);
+}
+
+.nc-relevance {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Cuerpo */
+.nc-body {
+  margin-bottom: 0.5rem;
+}
+
+.nc-title-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.nc-title {
+  font-size: 0.97rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.35;
+  flex: 1;
+  font-family: var(--font-heading);
+}
+
+.nc-logo-text {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--text-tertiary);
+  white-space: nowrap;
+  font-family: var(--font-heading);
+  letter-spacing: -0.02em;
+  flex-shrink: 0;
+}
+
+.nc-excerpt {
+  font-size: 0.78rem;
+  color: var(--text-tertiary);
+  line-height: 1.5;
+  margin-top: 0.25rem;
+}
+
+/* Badges de métricas */
+.nc-metrics {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.5rem;
+}
+
+.nc-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.18rem 0.6rem;
+  border-radius: 4px;
+  border: 1px solid transparent;
+}
+
+.nc-badge-red {
+  background: rgba(239, 68, 68, 0.12);
+  color: #f87171;
+  border-color: rgba(239, 68, 68, 0.2);
+}
+
+.nc-badge-orange {
+  background: rgba(245, 158, 11, 0.12);
+  color: #fbbf24;
+  border-color: rgba(245, 158, 11, 0.2);
+}
+
+.nc-badge-blue {
+  background: rgba(122, 63, 175, 0.12);
+  color: #a78bfa;
+  border-color: rgba(122, 63, 175, 0.2);
+}
+
+/* Botones de acción */
+.nc-actions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.nc-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.2rem 0;
+  text-decoration: none;
+  transition: color 0.15s;
+  font-family: var(--font-body);
+}
+
+.nc-action-btn:hover {
+  color: var(--accent);
+}
+
 .empty-desc {
   font-size: 0.95rem;
   max-width: 400px;

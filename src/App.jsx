@@ -796,55 +796,73 @@ export default function App() {
                       <p className="empty-desc">Pulsa "Buscar ahora" para iniciar una búsqueda manual o espera al próximo ciclo automático de n8n.</p>
                     </div>
                   ) : (
-                    <div className="table-responsive">
-                      <table className="mentions-table">
-                        <thead>
-                          <tr>
-                            <th>Titular</th>
-                            <th>Contexto mención</th>
-                            <th>Valoración</th>
-                            <th>Medio</th>
-                            <th className="text-center">{subKw1 || 'Keyword 1'}</th>
-                            <th className="text-center">{subKw2 || 'Keyword 2'}</th>
-                            <th className="text-right">Alcance</th>
-                            <th className="text-right">
-                              Valor 
-                              <div className="tooltip-container">
-                                <Info className="w-3 h-3 inline-block ml-1 opacity-50 cursor-help" />
-                                <span className="tooltip-text">
-                                  VPE: Basado en tono y alcance del medio.
+                    <div className="news-cards-list">
+                      {enrichedMentions.map((m, i) => {
+                        const dateLabel = m.mention_date || (m.found_at ? format(new Date(m.found_at), "dd/MM/yyyy", { locale: es }) : '');
+                        const tonoColor = m.tono === 'positivo' ? '#10b981' : m.tono === 'negativo' ? '#ef4444' : '#f59e0b';
+                        const mediaInitial = (m.source || '?')[0].toUpperCase();
+                        return (
+                          <div key={m.id || i} className="news-card">
+                            {/* Cabecera */}
+                            <div className="nc-header">
+                              <div className="nc-header-left">
+                                <div className="nc-media-icon" style={{ background: activeKw.color }}>
+                                  {mediaInitial}
+                                </div>
+                                <span className="nc-source">{m.source || '—'}</span>
+                                <span className="nc-meta-sep">·</span>
+                                <span className="nc-meta">Edición Digital</span>
+                                {subKw1 && <><span className="nc-meta-sep">·</span><span className="nc-meta">{subKw1}: <strong>{m.sub1}</strong></span></>}
+                                {subKw2 && <><span className="nc-meta-sep">·</span><span className="nc-meta">{subKw2}: <strong>{m.sub2}</strong></span></>}
+                              </div>
+                              <div className="nc-header-right">
+                                <span className="nc-date">{dateLabel}</span>
+                                <span className="nc-relevance" style={{ color: tonoColor }}>
+                                  TONO {m.tono.toUpperCase()}
                                 </span>
                               </div>
-                            </th>
-                            <th>Fecha</th>
-                            <th>PDF</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {enrichedMentions.map((m, i) => (
-                            <tr key={m.id || i}>
-                              <td className="font-medium">{m.title}</td>
-                              <td className="text-sm color-secondary">{(m.excerpt || '').slice(0, 150) + '...'}</td>
-                              <td>
-                                <span className={`badge ${m.tono}`}>{m.tono}</span>
-                              </td>
-                              <td className="font-medium">{m.source}</td>
-                              <td className="text-center">{m.sub1.toLowerCase()}</td>
-                              <td className="text-center">{m.sub2.toLowerCase()}</td>
-                              <td className="text-right font-medium">{m.reach.toLocaleString()}</td>
-                              <td className="text-right font-medium" style={{ color: 'var(--success)' }}>{m.value.toLocaleString()} €</td>
-                              <td className="text-sm whitespace-nowrap">{m.mention_date || (m.found_at && format(new Date(m.found_at), "dd MMM yyyy", { locale: es }))}</td>
-                              <td>
-                                {m.url ? (
-                                  <a href={m.url} target="_blank" rel="noopener noreferrer" className="link-icon" title="Ver artículo">
-                                    <ExternalLink className="w-4 h-4" />
-                                  </a>
-                                ) : '-'}
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
+                            </div>
+
+                            {/* Título */}
+                            <div className="nc-body">
+                              <div className="nc-title-row">
+                                <h3 className="nc-title">{m.title}</h3>
+                                <span className="nc-logo-text">{m.source}</span>
+                              </div>
+                              {m.excerpt && (
+                                <p className="nc-excerpt">{m.excerpt.slice(0, 200)}{m.excerpt.length > 200 ? '…' : ''}</p>
+                              )}
+                            </div>
+
+                            {/* Badges de métricas */}
+                            <div className="nc-metrics">
+                              <span className="nc-badge nc-badge-red">
+                                Alcance: {m.reach.toLocaleString()}
+                              </span>
+                              <span className="nc-badge nc-badge-orange">
+                                Valor: {m.value.toLocaleString()} €
+                              </span>
+                              <span className="nc-badge nc-badge-blue">
+                                Tono: {m.tono}
+                              </span>
+                            </div>
+
+                            {/* Acciones */}
+                            <div className="nc-actions">
+                              {m.excerpt && (
+                                <button className="nc-action-btn" onClick={() => alert(m.excerpt)}>
+                                  <FileText className="w-3.5 h-3.5" /> Ver fragmento
+                                </button>
+                              )}
+                              {m.url && (
+                                <a href={m.url} target="_blank" rel="noopener noreferrer" className="nc-action-btn">
+                                  <ExternalLink className="w-3.5 h-3.5" /> Ver artículo
+                                </a>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
                   )
                 ) : (
