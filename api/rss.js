@@ -10,35 +10,49 @@ module.exports = async function handler(req, res) {
 
   if (!keyword) return res.status(400).json({ error: 'Falta keyword' });
 
-  // Rango de fechas (ms) para filtrar
+  // Normalizar keyword: quitar tildes y pasar a minúsculas para matching flexible
+  const normalize = str => str.toLowerCase()
+    .normalize('NFD').replace(/[̀-ͯ]/g, '') // quitar tildes
+    .replace(/[^a-z0-9\s]/g, ' ').trim();
+
+  const kwNorm = normalize(keyword);
+  const kwWords = kwNorm.split(/\s+/).filter(w => w.length > 2); // palabras relevantes
+
+  // Un artículo coincide si contiene TODAS las palabras de la keyword (sin tildes)
+  const matchesKeyword = (text) => {
+    const textNorm = normalize(text);
+    return kwWords.every(w => textNorm.includes(w));
+  };
+
+  // Rango de fechas (ms)
   const now     = Date.now();
-  const cutoff  = fromDate
-    ? new Date(fromDate).getTime()
-    : now - 30 * 24 * 60 * 60 * 1000; // últimos 30 días por defecto
-  const ceiling = toDate
-    ? new Date(toDate + 'T23:59:59').getTime()
-    : now;
+  const cutoff  = fromDate ? new Date(fromDate).getTime() : now - 30 * 24 * 60 * 60 * 1000;
+  const ceiling = toDate   ? new Date(toDate + 'T23:59:59').getTime() : now;
 
-  const kw = keyword.toLowerCase();
-
-  // Google News con variantes para más cobertura
   const googleBase = `https://news.google.com/rss/search?hl=es&gl=ES&ceid=ES:es&q=`;
+
+  // Variantes de búsqueda en Google News (keyword + versiones sin tildes)
+  const kwEncoded       = encodeURIComponent(keyword);
+  const kwNormEncoded   = encodeURIComponent(normalize(keyword));
+
   const rssUrls = [
-    // Google News — keyword exacta
+    // === GOOGLE NEWS — máxima cobertura con variantes ===
     googleBase + encodeURIComponent(`"${keyword}"`),
-    // Google News — keyword sin comillas (más resultados)
-    googleBase + encodeURIComponent(keyword),
-    // Google News — keyword + España
+    googleBase + kwEncoded,
+    googleBase + kwNormEncoded,
     googleBase + encodeURIComponent(`${keyword} España`),
-    // Google News — keyword + prensa
+    googleBase + encodeURIComponent(`${keyword} Andalucía`),
     googleBase + encodeURIComponent(`${keyword} noticias`),
 
-    // Agencias de noticias
+    // === AGENCIAS ===
     `https://www.europapress.es/rss/rss.aspx`,
-    // Prensa nacional
+    `https://www.europapress.es/andalucia/rss/rss.aspx`,
+
+    // === PRENSA NACIONAL ===
     `https://feeds.elpais.com/mrss-s/pages/ep/site/elpais.com/portada`,
     `https://www.elmundo.es/rss/portada.xml`,
     `https://www.abc.es/rss/feeds/abc_espana.xml`,
+    `https://www.abc.es/rss/feeds/abc_andalucia.xml`,
     `https://www.lavanguardia.com/rss/home.xml`,
     `https://rss.elconfidencial.com/espana/`,
     `https://www.20minutos.es/rss/`,
@@ -48,39 +62,98 @@ module.exports = async function handler(req, res) {
     `https://okdiario.com/feed`,
     `https://www.infolibre.es/rss`,
     `https://www.libertaddigital.com/rss/portada.xml`,
-    // Prensa económica
+
+    // === PRENSA ECONÓMICA ===
     `https://www.expansion.com/rss/portada.xml`,
-    `https://www.cincodias.elpais.com/rss/feed.html`,
     `https://www.eleconomista.es/rss/rss-ultima-hora.php`,
-    // Radio y TV
+
+    // === RADIO Y TV ===
     `https://www.cadenaser.com/rss/cadenaser.com/portada.xml`,
     `https://www.rtve.es/api/noticias.rss`,
     `https://www.cope.es/rss`,
     `https://www.ondacero.es/rss/`,
-    // Regionales
+
+    // === MEDIOS DIGITALES ANDALUCES (del listado MyNews) ===
+    `https://www.diariodesevilla.es/rss/portada.xml`,
+    `https://www.diariodecadiz.es/rss/portada.xml`,
+    `https://www.diariocordoba.com/rss/portada.xml`,
+    `https://www.diariodealmeria.es/rss/portada.xml`,
+    `https://www.granadahoy.com/rss/portada.xml`,
+    `https://www.malagahoy.es/rss/portada.xml`,
+    `https://www.huelvainformacion.es/rss/portada.xml`,
+    `https://www.jaenhoy.es/rss/portada.xml`,
+    `https://www.diariosur.es/rss/portada.xml`,
+    `https://www.europasur.es/rss/portada.xml`,
+    `https://www.eldiadecordoba.es/rss/portada.xml`,
+    `https://www.laopiniondemalaga.es/rss/portada.xml`,
+    `https://www.lavozdealmeria.com/rss`,
+    `https://www.ahoragranada.com/feed/`,
+    `https://www.cordobahoy.es/feed/`,
+    `https://www.noticiasdealmeria.com/rss/portada.xml`,
+    `https://www.agrodiariohuelva.es/feed/`,
+    `https://sevilla.abc.es/rss/feeds/abc_sevilla.xml`,
+
+    // === REGIONALES NACIONALES ===
     `https://www.elperiodico.com/es/rss/rss_portada.xml`,
     `https://www.heraldo.es/rss/portada.xml`,
     `https://www.elcorreo.com/rss/portada.xml`,
     `https://www.lasprovincias.es/rss/portada.xml`,
-    `https://www.laopiniondezamora.es/rss/portada.xml`,
     `https://www.elcomercio.es/rss/portada.xml`,
     `https://www.elnortedecastilla.es/rss/portada.xml`,
+    `https://www.lavozdegalicia.es/rss/portada.xml`,
+    `https://www.elperiodico.com/es/rss/rss_portada.xml`,
+    `https://www.laverdad.es/rss/portada.xml`,
+    `https://www.sur.es/rss/portada.xml`,
+    `https://www.ideal.es/rss/portada.xml`,
+    `https://www.huelvabuenas.es/feed/`,
   ];
 
   const allMentions = [];
   const seen = new Set();
 
+  function parseDate(pubDate) {
+    if (!pubDate) return { pubMs: null, dateStr: '' };
+    try {
+      const d = new Date(pubDate);
+      if (isNaN(d.getTime())) return { pubMs: null, dateStr: '' };
+      return {
+        pubMs: d.getTime(),
+        dateStr: `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`
+      };
+    } catch { return { pubMs: null, dateStr: '' }; }
+  }
+
+  function extractLink(block) {
+    // Google News usa <link> con CDATA o texto, o <guid>
+    const patterns = [
+      /<link>([^<\s]+)<\/link>/i,
+      /<link><!\[CDATA\[([^\]]+)\]\]><\/link>/i,
+      /<link[^>]+href="([^"]+)"/i,
+      /<guid[^>]*isPermaLink="true"[^>]*>([^<]+)<\/guid>/i,
+      /<guid>([^<]+)<\/guid>/i,
+    ];
+    for (const p of patterns) {
+      const m = block.match(p);
+      if (m && m[1] && m[1].startsWith('http')) return m[1].trim();
+    }
+    return '';
+  }
+
   async function fetchRSS(url) {
     try {
       const ctrl = new AbortController();
-      const t = setTimeout(() => ctrl.abort(), 7000);
+      const t = setTimeout(() => ctrl.abort(), 8000);
       const r = await fetch(url, {
         signal: ctrl.signal,
-        headers: { 'User-Agent': 'Mozilla/5.0 (compatible; DeepTalkBot/1.0; +https://deeptalk.xul.es)' }
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
+          'Accept': 'application/rss+xml, application/xml, text/xml, */*'
+        }
       });
       clearTimeout(t);
       if (!r.ok) return [];
       const xml = await r.text();
+      if (!xml.includes('<item')) return [];
 
       const items = [];
       const itemRegex = /<item[^>]*>([\s\S]*?)<\/item>/gi;
@@ -89,7 +162,9 @@ module.exports = async function handler(req, res) {
         const block = m[1];
 
         const getTag = (tag) => {
-          const rx = new RegExp(`<${tag}[^>]*><!\\[CDATA\\[([\\s\\S]*?)\\]\\]><\\/${tag}>|<${tag}[^>]*>([\\s\\S]*?)<\\/${tag}>`, 'i');
+          const rx = new RegExp(
+            `<${tag}[^>]*><!\\[CDATA\\[([\\s\\S]*?)\\]\\]><\\/${tag}>|<${tag}[^>]*>([\\s\\S]*?)<\\/${tag}>`, 'i'
+          );
           const match = block.match(rx);
           return match ? (match[1] || match[2] || '').trim() : '';
         };
@@ -97,59 +172,46 @@ module.exports = async function handler(req, res) {
         const title       = getTag('title');
         const description = getTag('description');
         const pubDate     = getTag('pubDate');
-        const sourceTag   = (block.match(/<source[^>]*>(.*?)<\/source>/i) || [])[1] || '';
+        const sourceTag   = (block.match(/<source[^>]*>([^<]*)<\/source>/i) || [])[1] || '';
 
-        // Extraer link (puede estar como <link> o como <guid isPermaLink="true">)
-        let link = '';
-        const linkMatch = block.match(/<link>([^<]+)<\/link>/i)
-          || block.match(/<link[^>]*href="([^"]+)"/i)
-          || block.match(/<guid[^>]*isPermaLink="true"[^>]*>([^<]+)<\/guid>/i);
-        if (linkMatch) link = linkMatch[1].trim();
-
+        const link = extractLink(block);
         if (!link || !title) continue;
 
-        // Filtrar por keyword en título o descripción
-        const combined = (title + ' ' + description).toLowerCase();
-        // Para feeds genéricos (no Google News) exigir que aparezca la keyword
+        // Filtrar por keyword (insensible a tildes y mayúsculas)
         const isGoogleNews = url.includes('news.google.com');
-        if (!isGoogleNews && !combined.includes(kw)) continue;
-
-        // Filtrar por fecha de publicación
-        let pubMs = null;
-        let dateStr = '';
-        if (pubDate) {
-          try {
-            const d = new Date(pubDate);
-            if (!isNaN(d.getTime())) {
-              pubMs = d.getTime();
-              dateStr = `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
-            }
-          } catch {}
+        if (!isGoogleNews) {
+          const combined = title + ' ' + description;
+          if (!matchesKeyword(combined)) continue;
         }
 
-        // Descartar artículos fuera del rango de fechas
+        // Filtrar por fecha
+        const { pubMs, dateStr } = parseDate(pubDate);
         if (pubMs !== null) {
           if (pubMs < cutoff)  continue;
           if (pubMs > ceiling) continue;
         }
 
-        // Deduplicar
-        const cleanUrl = link.replace(/^https?:\/\/(www\.)?/, '').split('?')[0];
-        if (seen.has(cleanUrl)) continue;
-        seen.add(cleanUrl);
+        // Deduplicar — para Google News usar el dominio real si es un redirect
+        let dedupeKey = link.replace(/^https?:\/\/(www\.)?/, '').split('?')[0];
+        if (seen.has(dedupeKey)) continue;
+        seen.add(dedupeKey);
 
         // Nombre del medio
         let source = sourceTag;
         if (!source) {
-          try { source = new URL(link).hostname.replace('www.', ''); } catch { source = 'Desconocido'; }
+          try {
+            const host = new URL(link).hostname.replace('www.', '');
+            // Si es un link de Google News, marcarlo como Google News
+            source = link.includes('news.google.com') ? 'Google News' : host;
+          } catch { source = 'Desconocido'; }
         }
 
         items.push({
-          title: title.replace(/ [-–|] [^-–|]+$/, '').trim(),
+          title: title.replace(/ [-–|] [^-–|]{1,30}$/, '').trim(),
           source,
           url: link,
           date: dateStr,
-          excerpt: description.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim().slice(0, 250)
+          excerpt: description.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim().slice(0, 280)
         });
       }
       return items;
@@ -163,18 +225,14 @@ module.exports = async function handler(req, res) {
     if (r.status === 'fulfilled') allMentions.push(...r.value);
   }
 
-  // Deduplicar global (distintos feeds pueden traer el mismo artículo)
+  // Deduplicación final
   const finalMentions = [];
   const seenFinal = new Set();
   for (const m of allMentions) {
     const key = m.url.replace(/^https?:\/\/(www\.)?/, '').split('?')[0];
-    if (!seenFinal.has(key)) {
-      seenFinal.add(key);
-      finalMentions.push(m);
-    }
+    if (!seenFinal.has(key)) { seenFinal.add(key); finalMentions.push(m); }
   }
 
-  // Ordenar por fecha desc
   finalMentions.sort((a, b) => {
     const parse = d => { if (!d) return 0; const [dd,mm,yy] = d.split('/'); return new Date(yy, mm-1, dd).getTime(); };
     return parse(b.date) - parse(a.date);
