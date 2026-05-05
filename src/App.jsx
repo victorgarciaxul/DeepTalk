@@ -388,11 +388,121 @@ export default function App() {
   };
 
   if (!config.isConfigured) {
+    // Barras del ecualizador — valores fijos para evitar re-renders
+    const eqBars = [
+      40,70,55,85,35,90,60,45,75,30,80,50,65,40,95,55,70,38,82,48,
+      63,77,42,58,88,33,72,52,67,43,78,36,62,47,83,53,69,39,74,44,
+      79,57,64,35,87,51,68,41,76,46,55,73,37,84,49,66,44,81,59,28
+    ];
+    const eqDur = [
+      0.8,1.1,0.9,1.3,0.7,1.2,1.0,0.85,1.15,0.95,1.25,0.75,1.05,1.35,0.82,
+      1.18,0.92,1.28,0.78,1.08,1.38,0.83,1.13,0.93,1.23,0.73,1.03,1.33,0.88,
+      1.48,0.98,1.18,0.68,1.08,0.88,1.28,0.78,1.18,0.98,1.38,0.84,1.14,0.94,
+      1.24,0.74,1.04,1.34,0.89,1.19,0.99,1.09,0.79,1.29,0.89,1.19,0.69,1.09,0.99,1.39,0.85
+    ];
+    const eqDelay = [
+      0,0.2,0.1,0.35,0.05,0.25,0.15,0.3,0.08,0.18,0.28,0.38,0.03,0.23,0.13,
+      0.33,0.07,0.27,0.17,0.37,0.02,0.22,0.12,0.32,0.06,0.26,0.16,0.36,0.04,
+      0.24,0.14,0.34,0.09,0.29,0.19,0.39,0.01,0.21,0.11,0.31,0.41,0.06,0.16,
+      0.26,0.36,0.11,0.21,0.31,0.41,0.16,0.06,0.26,0.36,0.04,0.14,0.24,0.34,0.09,0.19,0.29
+    ];
+
+    // Palabras flotantes de medios españoles
+    const floatWords = [
+      { w: 'El País',     x: 8,  y: 12, d: 9  },
+      { w: 'RTVE',        x: 78, y: 8,  d: 7  },
+      { w: 'ABC',         x: 22, y: 68, d: 11 },
+      { w: 'Cadena SER',  x: 60, y: 22, d: 8  },
+      { w: 'El Mundo',    x: 42, y: 80, d: 10 },
+      { w: 'Prensa',      x: 85, y: 55, d: 6  },
+      { w: 'Noticias',    x: 14, y: 44, d: 12 },
+      { w: 'Europa Press',x: 55, y: 60, d: 9  },
+      { w: 'La SER',      x: 30, y: 18, d: 7  },
+      { w: 'Digital',     x: 70, y: 76, d: 10 },
+      { w: 'Monitor',     x: 5,  y: 85, d: 8  },
+      { w: 'Radio',       x: 90, y: 32, d: 11 },
+      { w: 'La Vanguardia',x: 48, y: 35, d: 13 },
+      { w: 'Clipping',    x: 25, y: 92, d: 7  },
+      { w: 'El Confidencial', x: 65, y: 48, d: 9 },
+      { w: 'Medios',      x: 38, y: 55, d: 6  },
+    ];
+
     return (
       <div className="config-overlay">
+        {/* ── Fondo animado ── */}
+        <div className="login-bg-anim">
+          {/* Grid de puntos */}
+          <div className="login-grid" />
+
+          {/* Línea de escaneo */}
+          <div className="scan-line" />
+
+          {/* Ondas de radio */}
+          <div className="radio-waves">
+            <div className="radio-ring" />
+            <div className="radio-ring" />
+            <div className="radio-ring" />
+            <div className="radio-ring" />
+            <div className="radio-center-dot" />
+          </div>
+
+          {/* Ecualizador */}
+          <div className="eq-container">
+            {eqBars.map((h, i) => (
+              <div
+                key={i}
+                className="eq-bar"
+                style={{
+                  '--h': `${h}%`,
+                  '--d': `${eqDur[i] ?? 1}s`,
+                  animationDelay: `${eqDelay[i] ?? 0}s`
+                }}
+              />
+            ))}
+          </div>
+
+          {/* Palabras flotantes */}
+          {floatWords.map((fw) => (
+            <div
+              key={fw.w}
+              className="float-word"
+              style={{
+                left: `${fw.x}%`,
+                top: `${fw.y}%`,
+                '--d': `${fw.d}s`,
+                animationDelay: `${(fw.x * 0.07) % 3}s`
+              }}
+            >
+              {fw.w}
+            </div>
+          ))}
+        </div>
+
+        {/* ── Panel de login ── */}
         <div className="glass-panel config-panel">
-          <div className="config-header">
-            <h1 className="config-title">Configuración Inicial</h1>
+          {/* Logo DeepTalk dentro del panel */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '1.75rem', gap: '0.6rem' }}>
+            <div style={{
+              width: 52, height: 52, borderRadius: 14,
+              background: 'linear-gradient(145deg, #1a2a1a 0%, #0f1f0f 100%)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              boxShadow: '0 0 24px rgba(245,166,35,0.25), 0 4px 12px rgba(0,0,0,0.6)'
+            }}>
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                <path d="M5 12C5 8.13 8.13 5 12 5C15.87 5 19 8.13 19 12" stroke="#F5A623" strokeWidth="2.2" strokeLinecap="round" fill="none"/>
+                <rect x="3" y="12" width="4" height="6" rx="2" fill="#F5A623"/>
+                <rect x="17" y="12" width="4" height="6" rx="2" fill="#F5A623"/>
+              </svg>
+            </div>
+            <h1 style={{ fontFamily: 'var(--font-heading)', fontWeight: 800, fontSize: '1.6rem', letterSpacing: '-0.03em', color: 'var(--text-primary)', lineHeight: 1 }}>
+              DeepTalk
+            </h1>
+            <p style={{ fontSize: '0.78rem', color: 'var(--text-tertiary)', letterSpacing: '0.12em', textTransform: 'uppercase', fontWeight: 600 }}>
+              Monitor de Medios · XUL
+            </p>
+          </div>
+
+          <div className="config-header" style={{ marginBottom: '1.5rem' }}>
             <p className="config-desc">Introduce tus credenciales para comenzar a monitorizar.</p>
           </div>
           <form className="config-form" onSubmit={handleConfigSubmit}>

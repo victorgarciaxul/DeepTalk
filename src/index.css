@@ -747,19 +747,182 @@ body.dark .main-content {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(8px);
+  background: #07070a;
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
   padding: 1rem;
+  overflow: hidden;
 }
 
 .config-panel {
   width: 100%;
   max-width: 500px;
   padding: 2.5rem;
+  position: relative;
+  z-index: 2;
+}
+
+/* ===== LOGIN ANIMATED BACKGROUND ===== */
+.login-bg-anim {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Vignette overlay para que el panel sea legible */
+.login-bg-anim::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, rgba(7,7,10,0.55) 30%, rgba(7,7,10,0.82) 100%);
+  z-index: 10;
+}
+
+/* ── Ecualizador ── */
+.eq-container {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 220px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 3px;
+  padding: 0 8px;
+  opacity: 0.22;
+  z-index: 1;
+}
+
+.eq-bar {
+  flex: 1;
+  max-width: 14px;
+  min-width: 4px;
+  border-radius: 3px 3px 0 0;
+  background: linear-gradient(to top, #7A3FAF 0%, #a259d8 60%, #F5A623 100%);
+  animation: eqBounce var(--d, 1s) ease-in-out infinite alternate;
+  height: 12%;
+  will-change: height;
+}
+
+@keyframes eqBounce {
+  from { height: 6%; }
+  to   { height: var(--h, 80%); }
+}
+
+/* ── Ondas de radio ── */
+.radio-waves {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+}
+
+.radio-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 120px;
+  height: 120px;
+  margin-top: -60px;
+  margin-left: -60px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(122, 63, 175, 0.5);
+  animation: ringExpand 4s ease-out infinite;
+}
+.radio-ring:nth-child(2) { animation-delay: 1.3s; border-color: rgba(245, 166, 35, 0.3); }
+.radio-ring:nth-child(3) { animation-delay: 2.6s; border-color: rgba(122, 63, 175, 0.25); }
+.radio-ring:nth-child(4) { animation-delay: 3.9s; border-color: rgba(245, 166, 35, 0.2); }
+
+@keyframes ringExpand {
+  0%   { transform: scale(0.4); opacity: 0.7; }
+  100% { transform: scale(7);   opacity: 0;   }
+}
+
+/* ── Punto central ── */
+.radio-center-dot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #7A3FAF;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 16px 4px rgba(122, 63, 175, 0.6);
+  animation: dotPulse 2s ease-in-out infinite;
+  z-index: 3;
+}
+
+@keyframes dotPulse {
+  0%, 100% { box-shadow: 0 0 10px 3px rgba(122, 63, 175, 0.5); }
+  50%       { box-shadow: 0 0 24px 8px rgba(245, 166, 35, 0.6); }
+}
+
+/* ── Palabras flotantes ── */
+.float-word {
+  position: absolute;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(122, 63, 175, 0.28);
+  animation: floatUp var(--d, 9s) ease-in-out infinite;
+  will-change: transform, opacity;
+  white-space: nowrap;
+  z-index: 1;
+}
+
+@keyframes floatUp {
+  0%   { transform: translateY(18px);  opacity: 0; }
+  12%  { opacity: 1; }
+  80%  { opacity: 0.35; }
+  100% { transform: translateY(-28px); opacity: 0; }
+}
+
+/* ── Línea de escaneo ── */
+.scan-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(122, 63, 175, 0.0) 15%,
+    rgba(122, 63, 175, 0.35) 50%,
+    rgba(245, 166, 35, 0.2) 65%,
+    transparent 100%
+  );
+  animation: scanLine 6s linear infinite;
+  z-index: 2;
+}
+
+@keyframes scanLine {
+  0%   { top: 0%; }
+  100% { top: 100%; }
+}
+
+/* ── Líneas de grid de fondo ── */
+.login-grid {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image:
+    linear-gradient(rgba(122, 63, 175, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(122, 63, 175, 0.05) 1px, transparent 1px);
+  background-size: 48px 48px;
+  animation: gridShift 20s linear infinite;
+}
+
+@keyframes gridShift {
+  0%   { background-position: 0 0; }
+  100% { background-position: 48px 48px; }
 }
 
 .config-header {
