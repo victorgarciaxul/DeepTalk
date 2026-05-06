@@ -3,7 +3,8 @@ import {
   Search, Plus, Trash2, Pause, Play, Settings,
   Database, RefreshCw, BarChart2, List, ExternalLink,
   Activity, Layers, Award, FileText, Calendar, Download,
-  Clock, PieChart as PieChartIcon, Link2, Share2, Users, Moon, Sun, Info
+  Clock, PieChart as PieChartIcon, Link2, Share2, Users, Moon, Sun, Info,
+  Sparkles, Copy, Check, X, TrendingUp, MessageSquare, Lightbulb, Target
 } from 'lucide-react';
 import { PieChart, Pie, Cell, Tooltip as RechartsTooltip, ResponsiveContainer, Legend } from 'recharts';
 import jsPDF from 'jspdf';
@@ -54,6 +55,10 @@ export default function App() {
   const [dateTo, setDateTo] = useState('');
   const [showDateFilter, setShowDateFilter] = useState(false);
   const [openFaq, setOpenFaq] = useState(null);
+  const [showAnalysis, setShowAnalysis] = useState(false);
+  const [analysisData, setAnalysisData] = useState(null);
+  const [analysisLoading, setAnalysisLoading] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     document.body.classList.toggle('dark', darkMode);
@@ -290,6 +295,53 @@ export default function App() {
 
   const isFiltered = dateFrom || dateTo;
   const clearDateFilter = () => { setDateFrom(''); setDateTo(''); };
+
+  const handleAnalyze = async () => {
+    if (!activeKw || enrichedMentions.length === 0) return;
+    setAnalysisLoading(true);
+    setShowAnalysis(true);
+    setAnalysisData(null);
+    try {
+      const res = await fetch('/api/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          keyword: activeKw.text,
+          mentions: enrichedMentions.map(m => ({
+            title:   m.title,
+            source:  m.source,
+            excerpt: m.excerpt,
+            date:    m.mention_date || m.found_at || '',
+            tono:    m.tono
+          }))
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Error en análisis');
+      setAnalysisData(data);
+    } catch (e) {
+      setAnalysisData({ error: e.message });
+    }
+    setAnalysisLoading(false);
+  };
+
+  const handleCopyAnalysis = () => {
+    if (!analysisData) return;
+    const d = analysisData;
+    const text = [
+      `ANÁLISIS DE COBERTURA — ${activeKw?.text}`,
+      `\nRESUMEN\n${d.resumen}`,
+      `\nTONO GENERAL: ${(d.tono_general || '').toUpperCase()}\n${d.tono_descripcion}`,
+      `\nTEMAS CLAVE\n${(d.temas || []).map(t => `• ${t}`).join('\n')}`,
+      `\nHALLAZGOS\n${(d.hallazgos || []).map(h => `• ${h}`).join('\n')}`,
+      `\nCONCLUSIONES\n${d.conclusiones}`,
+      `\nRECOMENDACIONES\n${(d.recomendaciones || []).map(r => `• ${r}`).join('\n')}`,
+    ].join('\n');
+    navigator.clipboard.writeText(text).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2200);
+    });
+  };
 
   const handleExportPDF = () => {
     if (!activeKw || enrichedMentions.length === 0) return;
@@ -761,6 +813,14 @@ export default function App() {
                     </button>
                   )}
                   <button
+                    className="btn-outline btn-analysis"
+                    onClick={handleAnalyze}
+                    disabled={mentions.length === 0}
+                    style={{ opacity: mentions.length === 0 ? 0.5 : 1 }}
+                  >
+                    <Sparkles className="w-4 h-4" /> Análisis IA
+                  </button>
+                  <button
                     className="btn-outline"
                     onClick={handleExportPDF}
                     disabled={mentions.length === 0}
@@ -1014,6 +1074,100 @@ export default function App() {
           )}
         </main>
       </div>
+
+      {/* ── Modal de Análisis IA ── */}
+    {showAnalysis && (
+      <div className="analysis-overlay" onClick={(e) => { if (e.target === e.currentTarget) setShowAnalysis(false); }}>
+        <div className="analysis-modal">
+
+          {/* Header */}
+          <div className="am-header">
+            <div className="am-header-left">
+              <div className="am-icon-wrap"><Sparkles className="w-4 h-4" /></div>
+              <div>
+                <h2 className="am-title">Análisis de Cobertura</h2>
+                <p className="am-subtitle">
+                  {activeKw?.text} · {enrichedMentions.length} menciones analizadas
+                </p>
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: '0.5rem' }}>
+              {analysisData && !analysisData.error && (
+                <button className="am-copy-btn" onClick={handleCopyAnalysis}>
+                  {copied ? <><Check className="w-3.5 h-3.5" /> Copiado</> : <><Copy className="w-3.5 h-3.5" /> Copiar</>}
+                </button>
+              )}
+              <button className="am-close-btn" onClick={() => setShowAnalysis(false)}>
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+
+          {/* Body */}
+          <div className="am-body">
+            {analysisLoading ? (
+              <div className="am-loading">
+                <div className="am-spinner" />
+                <p>Analizando {enrichedMentions.length} noticias con IA…</p>
+              </div>
+            ) : analysisData?.error ? (
+              <div className="am-error">
+                <p>⚠️ {analysisData.error}</p>
+              </div>
+            ) : analysisData ? (
+              <>
+                {/* Resumen */}
+                <div className="am-section am-section-highlight">
+                  <div className="am-section-label"><FileText className="w-3.5 h-3.5" /> Resumen ejecutivo</div>
+                  <p className="am-text">{analysisData.resumen}</p>
+                </div>
+
+                {/* Tono general */}
+                <div className="am-section">
+                  <div className="am-section-label"><Activity className="w-3.5 h-3.5" /> Tono general</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.4rem' }}>
+                    <span className={`am-tono-badge am-tono-${analysisData.tono_general}`}>
+                      {(analysisData.tono_general || '').toUpperCase()}
+                    </span>
+                    <p className="am-text" style={{ margin: 0 }}>{analysisData.tono_descripcion}</p>
+                  </div>
+                </div>
+
+                {/* Temas + Hallazgos en grid */}
+                <div className="am-grid-2">
+                  <div className="am-section">
+                    <div className="am-section-label"><TrendingUp className="w-3.5 h-3.5" /> Temas clave</div>
+                    <ul className="am-list">
+                      {(analysisData.temas || []).map((t, i) => <li key={i}>{t}</li>)}
+                    </ul>
+                  </div>
+                  <div className="am-section">
+                    <div className="am-section-label"><Target className="w-3.5 h-3.5" /> Hallazgos</div>
+                    <ul className="am-list">
+                      {(analysisData.hallazgos || []).map((h, i) => <li key={i}>{h}</li>)}
+                    </ul>
+                  </div>
+                </div>
+
+                {/* Conclusiones */}
+                <div className="am-section am-section-highlight">
+                  <div className="am-section-label"><MessageSquare className="w-3.5 h-3.5" /> Conclusiones</div>
+                  <p className="am-text">{analysisData.conclusiones}</p>
+                </div>
+
+                {/* Recomendaciones */}
+                <div className="am-section">
+                  <div className="am-section-label"><Lightbulb className="w-3.5 h-3.5" /> Recomendaciones</div>
+                  <ul className="am-list am-list-recs">
+                    {(analysisData.recomendaciones || []).map((r, i) => <li key={i}>{r}</li>)}
+                  </ul>
+                </div>
+              </>
+            ) : null}
+          </div>
+        </div>
+      </div>
+    )}
     </div>
   );
 }
