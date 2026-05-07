@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 
-const AUTH_USER = import.meta.env.VITE_AUTH_USER || 'victorgarcia@xul.es';
-const AUTH_PASS = import.meta.env.VITE_AUTH_PASS || 'Xul2026';
+const AUTH_USER = import.meta.env.VITE_AUTH_USER || 'tech@xul.es';
+const AUTH_PASS = import.meta.env.VITE_AUTH_PASS || 'Xul14$';
 
 // Barras del ecualizador — valores fijos
 const EQ_BARS = [
