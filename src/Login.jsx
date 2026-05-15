@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react';
 
-const AUTH_USER = import.meta.env.VITE_AUTH_USER || 'tech@xul.es';
-const AUTH_PASS = import.meta.env.VITE_AUTH_PASS || 'Xul14$';
+// Lista de usuarios autorizados
+const AUTH_USERS = [
+  { user: 'tech@xul.es',             pass: 'Xul14$'   },
+  { user: 'rociohernandez@xul.es',   pass: 'Rocio14$' },
+];
 
 // Barras del ecualizador — valores fijos
 const EQ_BARS = [
@@ -58,7 +61,8 @@ export default function Login({ onLogin }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (user.trim() === AUTH_USER && pass === AUTH_PASS) {
+    const valid = AUTH_USERS.some(u => u.user === user.trim() && u.pass === pass);
+    if (valid) {
       sessionStorage.setItem('xul_auth', '1');
       onLogin();
     } else {
