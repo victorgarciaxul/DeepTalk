@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 const AUTH_USERS = [
   { user: 'tech@xul.es',             pass: 'Xul14$'   },
   { user: 'rociohernandez@xul.es',   pass: 'Rocio14$' },
+  { user: 'josecastillo@xul.es',     pass: 'Xul14$'   },
 ];
 
 // Barras del ecualizador — valores fijos
