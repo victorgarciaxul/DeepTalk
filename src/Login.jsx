@@ -66,6 +66,7 @@ export default function Login({ onLogin }) {
     const valid = AUTH_USERS.some(u => u.user === user.trim() && u.pass === pass);
     if (valid) {
       sessionStorage.setItem('xul_auth', '1');
+      localStorage.setItem('xul_tracker_email', user.trim());
       onLogin();
     } else {
       setError('Usuario o contraseña incorrectos.');
