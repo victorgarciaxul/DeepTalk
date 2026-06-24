@@ -588,6 +588,7 @@ body.dark .main-content {
 /* Content Area */
 .content-area {
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
   padding: 0 2.5rem 2.5rem;
 }
