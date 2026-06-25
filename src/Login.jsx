@@ -6,6 +6,7 @@ const AUTH_USERS = [
   { user: 'rociohernandez@xul.es',   pass: 'Rocio14$' },
   { user: 'josecastillo@xul.es',     pass: 'Xul14$'   },
   { user: 'carlagarcia@xul.es',      pass: 'Xul14$'   },
+  { user: 'jorgemelo@xul.es',        pass: 'Deep2026*' },
 ];
 
 // Barras del ecualizador — valores fijos
