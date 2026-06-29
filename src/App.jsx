@@ -54,7 +54,7 @@ export default function App() {
     sbUrl: import.meta.env.VITE_SB_URL || localStorage.getItem('xul_sb_url') || '',
     sbKey: import.meta.env.VITE_SB_KEY || localStorage.getItem('xul_sb_key') || '',
     oaKey: import.meta.env.VITE_OA_KEY || localStorage.getItem('xul_oa_key') || '',
-    isConfigured: !!(import.meta.env.VITE_SB_URL && import.meta.env.VITE_SB_KEY && import.meta.env.VITE_OA_KEY)
+    isConfigured: localStorage.getItem('xul_appcenter_auth') === '1' || !!(import.meta.env.VITE_SB_URL && import.meta.env.VITE_SB_KEY && import.meta.env.VITE_OA_KEY)
   });
 
   const [db, setDb] = useState(null);
