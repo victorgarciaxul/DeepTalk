@@ -62,6 +62,19 @@ export default function Login({ onLogin }) {
     return () => { document.body.style.background = ''; };
   }, []);
 
+  // SSO: si AppCenter pasa el email en la URL, entramos sin mostrar el login
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const ssoEmail = params.get('sso_email');
+    if (!ssoEmail) return;
+    const allowed = ['victorgarcia@xul.es','carlagarcia@xul.es','tech@xul.es','josecastillo@xul.es','jorgemelo@xul.es'];
+    if (!allowed.includes(ssoEmail.toLowerCase())) return;
+    sessionStorage.setItem('xul_auth', '1');
+    localStorage.setItem('xul_tracker_email', ssoEmail.toLowerCase());
+    window.history.replaceState({}, '', window.location.pathname);
+    onLogin();
+  }, []);
+
   const handleSubmit = (e) => {
     e.preventDefault();
     const valid = AUTH_USERS.some(u => u.user === user.trim() && u.pass === pass);
