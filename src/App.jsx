@@ -7,13 +7,13 @@ import { useState, useEffect } from 'react';
   if (ssoEmail) {
     const allowed = ['victorgarcia@xul.es','carlagarcia@xul.es','tech@xul.es','josecastillo@xul.es','elenarojo@xul.es','jorgemelo@xul.es','silviamunoz@xul.es'];
     if (allowed.includes(ssoEmail.toLowerCase())) {
-      sessionStorage.setItem('xul_auth', '1');
-      sessionStorage.setItem('xul_user', ssoEmail.toLowerCase());
+      localStorage.setItem('xul_appcenter_auth', '1');
+      localStorage.setItem('xul_user', ssoEmail.toLowerCase());
       window.history.replaceState({}, '', window.location.pathname);
     }
   }
-  if (sessionStorage.getItem('xul_auth') !== '1') {
-    window.location.replace('https://appcenter.xul.es');
+  if (localStorage.getItem('xul_appcenter_auth') !== '1') {
+    window.location.replace('https://appcenter.xul.es?return_to=' + encodeURIComponent(window.location.origin));
   }
 })();
 import {
