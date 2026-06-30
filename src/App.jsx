@@ -1,18 +1,19 @@
 import { useState, useEffect } from 'react';
 
 // SSO + auth guard — antes de cualquier render
+// sessionStorage: se borra al cerrar la pestaña, nunca persiste entre sesiones
 ;(() => {
   const params = new URLSearchParams(window.location.search);
   const ssoEmail = params.get('sso_email');
   if (ssoEmail) {
     const allowed = ['victorgarcia@xul.es','carlagarcia@xul.es','tech@xul.es','josecastillo@xul.es','elenarojo@xul.es','jorgemelo@xul.es','silviamunoz@xul.es'];
     if (allowed.includes(ssoEmail.toLowerCase())) {
-      localStorage.setItem('xul_appcenter_auth', '1');
-      localStorage.setItem('xul_user', ssoEmail.toLowerCase());
+      sessionStorage.setItem('xul_appcenter_auth', '1');
+      sessionStorage.setItem('xul_user', ssoEmail.toLowerCase());
       window.history.replaceState({}, '', window.location.pathname);
     }
   }
-  if (localStorage.getItem('xul_appcenter_auth') !== '1') {
+  if (sessionStorage.getItem('xul_appcenter_auth') !== '1') {
     window.location.replace('https://appcenter.xul.es?return_to=' + encodeURIComponent(window.location.origin));
   }
 })();

@@ -5,8 +5,8 @@ import Login from './Login.jsx';
 import './index.css';
 
 function Root() {
-  const [authed, setAuthed] = useState(localStorage.getItem('xul_appcenter_auth') === '1');
-  if (!authed) return <Login onLogin={() => { localStorage.setItem('xul_appcenter_auth', '1'); setAuthed(true); }} />;
+  const [authed, setAuthed] = useState(sessionStorage.getItem('xul_appcenter_auth') === '1');
+  if (!authed) return <Login onLogin={() => { sessionStorage.setItem('xul_appcenter_auth', '1'); setAuthed(true); }} />;
   return <App />;
 }
 
